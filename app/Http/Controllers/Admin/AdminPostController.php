@@ -1,0 +1,103 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Validation\Rule;
+
+use Illuminate\Http\Request;
+use App\Models\Post;
+
+class AdminPostController extends Controller
+{
+    public function index(){
+        $posts = Post::get();
+        return view('admin.post',compact('posts'));
+    }
+    public function create(){
+        return view('admin.post_create');
+    }
+
+    public function store(Request $request){
+        $request->validate([
+            'title'=> 'required',
+            'slug'=> 'required|alpha_dash',
+            'short_description'=> 'required',
+            'description'=> 'required',
+            'photo'=> 'required|image|mimes:jpg,jpeg,png,gif'
+        ]);
+
+        $obj = new Post();
+
+        $ext=$request->file('photo')->extension();
+        $final_name='post_'.time().'.'.$ext;
+        $request->file('photo')->move(public_path('uploads/'),$final_name);
+
+        $obj->photo= $final_name;
+        $obj->title= $request->title;
+        $obj->slug= $request->slug;
+        $obj->short_description= $request->short_description;
+        $obj->description= $request->description;
+        $obj->total_view= 0;
+    $obj->save();
+        return redirect()->route('admin_post')->with('success','Data is saved successfully.');
+    }
+
+    public function edit($id){
+        $post_single=Post::where('id', $id)->first();
+        return view('admin.post_edit',company('post_single'));
+    }
+
+    public function update(Request $request,$id){
+        $obj= Testimonial::where('id',$id)->first();
+
+        $request->validate([
+            'name'=>'required',
+            'designated'=>'required',
+            'comment'=>'required',
+        ]);
+
+        if ($request->hasFile('photo')){
+            $request->validate([
+                'photo'=>'image|mimes:jpg,jpeg,png,gif'
+            ]);
+            unlink(public_path('uploads/*.$obj->photo'));
+
+            $ext=$request->file('photo')->extension();
+            $final_name='post_'.time().'.'.$ext;
+            $request->file('photo')->move(public_path('uploads/'),$final_name);
+
+            $obj->photo= $final_name;
+
+            }
+            $obj->photo= $final_name;
+            $obj->title= $request->title;
+            $obj->slug= $request->slug;
+            $obj->short_description= $request->short_description;
+            $obj->description= $request->description;
+            $obj->total_view= 0;
+            $obj->update();
+
+            return redirect()->route('admin_post')->with('success','Data is saved successfully.');
+
+    }
+    public function delete($id){
+        $post_single=Post::where('id',$id)->first();
+        unlink(public_path('uploads/'.$post_single->photo));
+        Post::where('id',$id)->delete();
+        return redirect()->route('admin_post')->with('success','Data is deleted successfully.');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

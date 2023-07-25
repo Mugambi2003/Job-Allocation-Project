@@ -84,7 +84,7 @@ to discuss what you would like to change.
 
 4. Submit a pull request.
 
-Kindly adhere to the code style guidelines and relevant testing in your changes.
+Kindly adhere to the code style guidelines and also relevant testing in your changes.
 
 
 ## License
